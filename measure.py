@@ -5,9 +5,8 @@ class HandleStatus(IntEnum):
     DISABLED = 4
     
 import numpy as np
-import Rotation_Plate_edit as rot
+import Rotation_Plate as rot
 import ndi_polaris_04_07 as ndi
-import Rotation_Plate_edit as rot
 import pickle 
 
 
@@ -23,7 +22,7 @@ try:
         frame = 50
         x = np.array(track_data[frame]['stray_markers']['markers']) # waehlt die Marker aus (aus welchen Frame?)
         x = x[:,2:] # schaut das nur x,y,z da sind
-        pickle_name = ('Test3.pkl')
+        pickle_name = ('Test5.pkl')
         
         with open(pickle_name, 'wb') as handle:
             pickle.dump(track_data, handle, protocol=pickle.HIGHEST_PROTOCOL)

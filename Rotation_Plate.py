@@ -151,7 +151,7 @@ def load_measurement(point_file_path = '/ceph/mri.meduniwien.ac.at/departments/p
     with open(point_file_path, 'rb') as fp:
         data2 = pickle.load(fp)
 
-    frame = 200
+    frame = 50
     x = np.array(data2[frame]['stray_markers']['markers']) # waehlt die Marker aus (aus welchen Frame?)
     x = x[:,2:] # schaut das nur x,y,z da sind
     x = np.array(x)
