@@ -317,7 +317,7 @@ def ToolInformation(msg):
 class Polaris(object):
     
     def __init__(self):
-        self.__romdir = './roms'
+        self.__romdir = '../roms'
         self.__trackers = []
         self.__reply_options = ReplyOptions.TRANSFORMATION_DATA | \
                                ReplyOptions.TOOL_AND_MARKER | \

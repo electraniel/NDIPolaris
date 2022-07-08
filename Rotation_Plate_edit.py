@@ -11,6 +11,8 @@ import numpy as np
 import pickle
 from enum import IntEnum
 from sklearn.neighbors import BallTree
+import sys
+import math as m
 
 class HandleStatus(IntEnum):
     VALID = 1
@@ -45,8 +47,9 @@ def plot(Mat,title):
     plt.title(title)
     ax = fig.add_subplot(projection='3d')       #3d plot
     ax.set_zlim(-150,150)
-    ax.scatter(*Mat[:,1:])
-    ax.scatter(*Mat[:,0], c='red')
+    ax.scatter(*Mat)
+    #ax.scatter(*Mat[:,1:])
+    #ax.scatter(*Mat[:,0], c='red')
     
 def plot_comp(A,B,title) :
     fig = plt.figure()                          #definiert plot
@@ -130,8 +133,7 @@ def T_Matrix(t):
                      [0, 0, 1, t[2] ],
                      [0, 0, 0, 1]])
 
-def load_reference():
-    path = '/ceph/mri.meduniwien.ac.at/departments/physics/fmrilab/home/dcolin/solution_20211115-151419.pkl'
+def load_reference(path = '/ceph/mri.meduniwien.ac.at/departments/physics/fmrilab/home/dcolin/solution_20211115-151419.pkl'):
     with open(path, 'rb') as fp:
         B = pickle.load(fp)
     
@@ -140,16 +142,20 @@ def load_reference():
     B = B*10  #Umwandlung in mm
     return B
 
-def load_measurement():
-    point_file_path = '/ceph/mri.meduniwien.ac.at/departments/physics/fmrilab/home/dcolin/test_04_07.pkl'
-    with open(point_file_path, 'rb') as fp:
-        data = pickle.load(fp)
 
-    frame = 100
-    x = np.array(data[frame]['stray_markers']['markers']) # waehlt die Marker aus (aus welchen Frame?)
+
+#point_file_path = '/ceph/mri.meduniwien.ac.at/departments/physics/fmrilab/home/dcolin/test_04_07.pkl'
+
+
+def load_measurement(point_file_path = '/ceph/mri.meduniwien.ac.at/departments/physics/fmrilab/home/dcolin/Measuring_Scripts/Test2.pkl'):
+    with open(point_file_path, 'rb') as fp:
+        data2 = pickle.load(fp)
+
+    frame = 200
+    x = np.array(data2[frame]['stray_markers']['markers']) # waehlt die Marker aus (aus welchen Frame?)
     x = x[:,2:] # schaut das nur x,y,z da sind
+    x = np.array(x)
     return x
-    
 
 def pca(x):
     #Kovarianz Matrix berechnen 
@@ -175,19 +181,19 @@ def get_rot_matrix(x = load_measurement() ,B = load_reference()):
     phi = 0
     t = np.array([0.0,0.0,0.0])
     
-    while x.shape != (18,3):
-        v,d,dp = pca(x)
-        t += -x.mean(0)
-        print (t)
-        mask = d < dmax    
-        xm = x[mask]
-        v,d,dp = pca(xm)
-        mask2 = dp < dpmax                       
-        xm = x[mask][mask2]
-        x = xm - xm.mean(0)
-        t += -xm.mean(0)
-        print (t)
-    
+    #while x.shape != (18,3):
+
+    v,d,dp = pca(x)
+    #print (t)
+    mask = d < dmax    
+    xm = x[mask]
+    v,d,dp = pca(xm)
+    mask2 = dp < dpmax                       
+    xm = x[mask][mask2]
+    x = xm - xm.mean(0)
+    t += -xm.mean(0)
+    #print (t)
+
     B_hom = np.hstack((B, np.ones((B.shape[0], 1))))
     X_hom = np.hstack((x, np.ones((x.shape[0], 1))))
     
@@ -204,14 +210,37 @@ def get_rot_matrix(x = load_measurement() ,B = load_reference()):
     X = (M @ X_zrot)[:3]
     
     plot_comp(B.T,X,"Vergleich") 
-    M_fin = T @ rotZ(phi_min) @ M 
+    M_fin = M @ rotZ(phi_min) @ T 
     return (M_fin)
 
-M = get_rot_matrix()
-print (M)
-x = load_measurement()
-X_hom = np.hstack((x, np.ones((x.shape[0], 1))))
-X = M @ X_hom.T
+#Return Euler Angles from Rotation Matrix
+#
 
-B = load_reference()
-plot_comp(B.T,X,"Vergleich") 
+def rot2eul(R):
+    tol = sys.float_info.epsilon * 10
+    if abs(R.item(0,0))< tol and abs(R.item(1,0)) < tol:
+       eul1 = 0
+       eul2 = m.atan2(-R.item(2,0), R.item(0,0))
+       eul3 = m.atan2(-R.item(1,2), R.item(1,1))
+    else:   
+       eul1 = m.atan2(R.item(1,0),R.item(0,0))
+       sp = m.sin(eul1)
+       cp = m.cos(eul1)
+       eul2 = m.atan2(-R.item(2,0),cp*R.item(0,0)+sp*R.item(1,0))
+       eul3 = m.atan2(sp*R.item(0,2)-cp*R.item(1,2),cp*R.item(1,1)-sp*R.item(0,1))
+    
+    phi = np.rad2deg(eul1)
+    theta  = np.rad2deg(eul2)
+    psi = np.rad2deg(eul3)
+    
+    return phi, theta ,psi
+
+"""
+x = load_measurement()
+fig = plt.figure()                          #definiert plot
+ax = fig.add_subplot(projection='3d')       #3d plot
+ax.scatter(*x.T)
+ax.set_box_aspect([1,1,1])
+set_axes_equal(ax)
+"""
+
