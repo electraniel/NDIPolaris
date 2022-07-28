@@ -606,6 +606,18 @@ class Polaris(object):
         return self.__trackers
     
 
+triangles = call_position_plate()['triangles']
+nums = list(range(0,18))
+tli = []
+tl = []
+for i,triangle in enumerate(triangles):
+    if triangle[0] in nums and triangle[1] in nums and triangle[2] in nums:
+       nums.remove(triangle[0])
+       nums.remove(triangle[1])
+       nums.remove(triangle[2])
+       tl.append(triangle)
+       tli.append(i)
+"""
 p = Polaris()
 plate_roms = get_plate_roms()
 rom_start, rom_end = 0 , 18
@@ -616,7 +628,7 @@ track_data = p.perform_tracking( duration = 10., record = lambda *_: True)
 pickle_name = 'Test{},{}.pkl'.format(rom_start,rom_end)
 with open(pickle_name, 'wb') as handle:
     pickle.dump(track_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
+"""
     
 """
 p = Polaris()

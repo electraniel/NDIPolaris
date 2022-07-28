@@ -50,11 +50,14 @@ def start_plate_measurement():
     
     pass
 
+
+
 final_position = position_plate()
 plate_roms = ndi.get_plate_roms()
 rom_start, rom_end = 0 , 18
 romlist = [plate_roms[rom_start:rom_end]]
-p.setup(*romlist)
+#p.setup(*romlist)
+p.setup([plate_roms[0],plate_roms[1],plate_roms[5],plate_roms[6],plate_roms[11]])
 p.prepare_tracking()
 track_data = p.perform_tracking( duration = 10., record = lambda *_: True)
 pickle_name = 'Test{},{}.pkl'.format(rom_start,rom_end)
@@ -63,7 +66,7 @@ with open(pickle_name, 'wb') as handle:
 
     
 """
-    M = rot.get_rot_matrix(x = rot.load_measurement('/ceph/mri.meduniwien.ac.at/departments/physics/fmrilab/home/dcolin/Measuring_Scripts/Plate_test.pkl') )
+M = rot.get_rot_matrix(x = rot.load_measurement('/ceph/mri.meduniwien.ac.at/departments/physics/fmrilab/home/dcolin/Measuring_Scripts/Plate_test.pkl') )
 
 print (M)
 """
