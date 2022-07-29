@@ -57,10 +57,11 @@ plate_roms = ndi.get_plate_roms()
 rom_start, rom_end = 0 , 18
 romlist = [plate_roms[rom_start:rom_end]]
 #p.setup(*romlist)
-p.setup([plate_roms[0],plate_roms[1],plate_roms[5],plate_roms[6],plate_roms[11]])
+p.setup([plate_roms[0],plate_roms[1],plate_roms[5],plate_roms[11],plate_roms[18]])
 p.prepare_tracking()
-track_data = p.perform_tracking( duration = 10., record = lambda *_: True)
-pickle_name = 'Test{},{}.pkl'.format(rom_start,rom_end)
+track_data = p.perform_tracking( duration = 100., record = lambda *_: True)
+#pickle_name = 'Test{},{}.pkl'.format(rom_start,rom_end)
+pickle_name = 'Measurment_0_1_5_11_18.pkl'.format(rom_start,rom_end)
 with open(pickle_name, 'wb') as handle:
     pickle.dump(track_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 

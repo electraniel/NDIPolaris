@@ -605,18 +605,47 @@ class Polaris(object):
     def trackers(self):
         return self.__trackers
     
+    
+def comp_triangle(k,l):
+    ans = True 
+    for point in k:
+        if point in l:
+            ans = False
+    return ans
 
+           
 triangles = call_position_plate()['triangles']
-nums = list(range(0,18))
-tli = []
-tl = []
-for i,triangle in enumerate(triangles):
-    if triangle[0] in nums and triangle[1] in nums and triangle[2] in nums:
-       nums.remove(triangle[0])
-       nums.remove(triangle[1])
-       nums.remove(triangle[2])
-       tl.append(triangle)
-       tli.append(i)
+j = 0
+tl_list = []
+tli_list = []
+while j < 12: 
+    nums = list(range(0,18))
+    tli = []
+    tl = []
+    for i,triangle in enumerate(triangles):
+        if i == j : pass 
+        else:    
+            if triangle[0] in nums and triangle[1] in nums and triangle[2] in nums:
+               nums.remove(triangle[0])
+               nums.remove(triangle[1])
+               nums.remove(triangle[2])
+               tl.append(triangle)
+               tli.append(i)
+    tl_list.append(tl)  
+    tli_list.append(tli)       
+    j+=1
+
+"""
+[[1, 2, 5, 6, 45],
+ [0, 3, 6, 7, 37],
+ [0, 1, 5, 6, 11],
+ [0, 1, 6, 7, 41],
+ [0, 1, 5, 11, 18],
+ [0, 1, 5, 6, 34]]
+
+"""
+
+
 """
 p = Polaris()
 plate_roms = get_plate_roms()
