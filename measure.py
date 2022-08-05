@@ -45,25 +45,42 @@ def position_plate():
     except KeyboardInterrupt:
         return rotation, translation
 
-def start_plate_measurement():
-    p.setup()
-    
-    pass
 
 
 
 final_position = position_plate()
-plate_roms = ndi.get_plate_roms()
-rom_start, rom_end = 0 , 18
-romlist = [plate_roms[rom_start:rom_end]]
-#p.setup(*romlist)
-p.setup([plate_roms[0],plate_roms[1],plate_roms[5],plate_roms[11],plate_roms[18]])
-p.prepare_tracking()
-track_data = p.perform_tracking( duration = 100., record = lambda *_: True)
+pr = ndi.get_plate_roms()
+plate_rom_lists = [
+[pr[1],pr[7],pr[18],pr[32],pr[41],pr[49]], 
+[pr[2],pr[5],pr[8],pr[39],pr[42],pr[45]], 
+[pr[3],pr[13],pr[16],pr[40],pr[46],pr[52]],    
+[pr[9],pr[12],pr[25],pr[26],pr[47],pr[48]],  
+[pr[0],pr[10],pr[11],pr[23],pr[24]],
+[pr[4],pr[21],pr[33],pr[36],pr[44]],
+[pr[6],pr[15],pr[27],pr[30],pr[37]],
+[pr[14],pr[17],pr[28],pr[29],pr[51]],
+[pr[19],pr[22],pr[35],pr[38],pr[50]],
+[pr[20],pr[31],pr[34],pr[43],pr[53]],
+    ]
+mname = ['A','B','C','D','E','F','G','H','I','J']
+
+
+def start_plate_measurement(i=0):
+    p.setup(plate_rom_lists[i])
+    p.prepare_tracking()
+    track_data = p.perform_tracking( duration = 200., record = lambda *_: True)
+    pickle_name = 'Measurement_{}'.format(mname[i])
+    with open(pickle_name, 'wb') as handle:
+        pickle.dump(track_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    
+
+for i in range (10):
+    start_plate_measurement(i)
+
+
+
 #pickle_name = 'Test{},{}.pkl'.format(rom_start,rom_end)
-pickle_name = 'Measurment_0_1_5_11_18.pkl'.format(rom_start,rom_end)
-with open(pickle_name, 'wb') as handle:
-    pickle.dump(track_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
     
 """
