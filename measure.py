@@ -68,8 +68,9 @@ mname = ['A','B','C','D','E','F','G','H','I','J']
 def start_plate_measurement(i=0):
     p.setup(plate_rom_lists[i])
     p.prepare_tracking()
-    track_data = p.perform_tracking( duration = 200., record = lambda *_: True)
-    pickle_name = 'Measurement_{}'.format(mname[i])
+    position = [final_position]
+    track_data = position + p.perform_tracking( duration = 120., record = lambda *_: True)
+    pickle_name = 'Measurement_{}3.pkl'.format(mname[i])
     with open(pickle_name, 'wb') as handle:
         pickle.dump(track_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
     
